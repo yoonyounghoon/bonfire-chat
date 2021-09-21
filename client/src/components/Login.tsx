@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { setTokenSourceMapRange } from 'typescript';
 
-type LoginProps = {};
+interface LoginProps {
+  setName: React.Dispatch<React.SetStateAction<string>>;
+  setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
+  name: string;
+}
 
-function Login({}: LoginProps) {
+function Login({ setName, name, setIsLogin }: LoginProps) {
+  const onChangeName: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const { value } = e.target;
+    setName(value);
+  };
+
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+
+    setIsLogin(true);
+  };
+
   return (
-    <LoginForm>
+    <LoginForm onSubmit={onSubmit}>
       <Title>이름을 알려주세요</Title>
-      <LoginInput />
+      <LoginInput value={name} onChange={onChangeName} />
     </LoginForm>
   );
 }
