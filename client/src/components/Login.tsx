@@ -59,6 +59,4 @@ const LoginInput = styled.input`
   outline: none;
   border: none;
   border-bottom: 3px solid #ffffff;
-
-  anima
 `;
