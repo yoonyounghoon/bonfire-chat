@@ -7,7 +7,7 @@ type ChatProps = {
   name: string;
 };
 
-type MessageType = 'notify' | 'yours' | 'me';
+export type MessageType = 'notify' | 'yours' | 'me';
 
 export type MessageProps = {
   type: MessageType;
@@ -18,15 +18,9 @@ function Chat({ name }: ChatProps) {
   const [messages, setMessages] = useState<MessageProps[] | []>([]);
   const [text, setText] = useState('');
 
-  const handleNewUser = (data: any) => {
-    console.log('handle new user');
-
-    setMessages(messages.concat(data));
-  };
-
   const handleNewMessage = (data: MessageProps) => {
     console.log('handle new messages');
-    setMessages([...messages, data]);
+    setMessages((messages) => [...messages, data]);
   };
 
   const chatSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -47,7 +41,7 @@ function Chat({ name }: ChatProps) {
 
   useEffect(() => {
     socket.emit('new user', name);
-    socket.on('get newUser', handleNewUser);
+    socket.on('get newUser', handleNewMessage);
     socket.on('get newMessage', handleNewMessage);
   }, []);
 
@@ -113,6 +107,7 @@ const ChatInput = styled.input`
   flex: 1;
   font-size: 1.5rem;
   padding: 1rem;
+  outline: none;
 `;
 const ChatButton = styled.button`
   background-color: #eeab00;
