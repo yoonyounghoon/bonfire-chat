@@ -38,13 +38,13 @@ io.on('connection', (socket) => {
     // 자신을 제외한 다른 클라이언트들한테는
     socket.broadcast.emit('get newMessage', {
       type: 'yours',
-      text,
+      text: `${socket.username}: ${text}`,
     });
 
     // 요청 보낸 클라이언트에게는
     io.to(id).emit('get newMessage', {
       type: 'me',
-      text,
+      text: `당신: ${text}`,
     });
   });
 });
