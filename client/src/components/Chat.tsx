@@ -15,6 +15,7 @@ export type MessageProps = {
 };
 
 function Chat({ name }: ChatProps) {
+  const [userCount, setUserCount] = useState(0);
   const [messages, setMessages] = useState<MessageProps[] | []>([]);
   const [text, setText] = useState('');
 
@@ -23,10 +24,12 @@ function Chat({ name }: ChatProps) {
     setMessages((messages) => [...messages, data]);
   };
 
+  const handleUserCount = (count: number) => {
+    setUserCount(count);
+  };
+
   const chatSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-
-    // 채팅 전송
     socket.emit('post message', {
       id: socket.id,
       text,
@@ -41,13 +44,14 @@ function Chat({ name }: ChatProps) {
 
   useEffect(() => {
     socket.emit('new user', name);
+    socket.on('get userCount', handleUserCount);
     socket.on('get newUser', handleNewMessage);
     socket.on('get newMessage', handleNewMessage);
   }, []);
 
   return (
     <ChatWrapper>
-      <Header>bonfire-Chat</Header>
+      <Header>bonfire-Chat: {userCount}</Header>
       <MessageList>
         {messages.length > 0 &&
           messages.map((message, idx) => (

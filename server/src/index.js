@@ -7,6 +7,8 @@ app.use(cors());
 const server = http.createServer(app);
 const socketIO = require('socket.io');
 
+let userCount = 0;
+
 const io = socketIO(server, {
   cors: {
     origin: 'http://localhost:3000',
@@ -15,17 +17,14 @@ const io = socketIO(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('User connected', socket.id);
-
   // 새로온 유저 이벤트
   socket.on('new user', (name) => {
-    console.log(name);
+    userCount += 1;
     socket.username = name;
+
+    io.emit('get userCount', userCount);
+
     io.emit('get newUser', {
-      type: 'notify',
-      text: `${socket.username}님이 입장하셨습니다.`,
-    });
-    console.log({
       type: 'notify',
       text: `${socket.username}님이 입장하셨습니다.`,
     });
@@ -45,6 +44,18 @@ io.on('connection', (socket) => {
     io.to(id).emit('get newMessage', {
       type: 'me',
       text: `당신: ${text}`,
+    });
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.log(reason);
+    userCount -= 1;
+
+    io.emit('get userCount', userCount);
+
+    io.emit('get newMessage', {
+      type: 'notify',
+      text: `${socket.username}님이 퇴장하셨습니다.`,
     });
   });
 });
