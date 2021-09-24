@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { socket } from '../App';
 import Message from './Message';
@@ -18,10 +18,11 @@ function Chat({ name }: ChatProps) {
   const [userCount, setUserCount] = useState(0);
   const [messages, setMessages] = useState<MessageProps[] | []>([]);
   const [text, setText] = useState('');
+  const messageEnd = useRef<HTMLUListElement | null>(null);
 
   const handleNewMessage = (data: MessageProps) => {
-    console.log('handle new messages');
     setMessages((messages) => [...messages, data]);
+    scrollToBottom();
   };
 
   const handleUserCount = (count: number) => {
@@ -42,6 +43,13 @@ function Chat({ name }: ChatProps) {
     setText(e.target.value);
   };
 
+  const scrollToBottom = () => {
+    messageEnd.current?.scrollTo({
+      top: messageEnd.current.scrollHeight,
+      behavior: 'smooth',
+    });
+  };
+
   useEffect(() => {
     socket.emit('new user', name);
     socket.on('get userCount', handleUserCount);
@@ -52,12 +60,13 @@ function Chat({ name }: ChatProps) {
   return (
     <ChatWrapper>
       <Header>bonfire-Chat: {userCount}</Header>
-      <MessageList>
+      <MessageList ref={messageEnd}>
         {messages.length > 0 &&
           messages.map((message, idx) => (
             <Message key={idx} type={message.type} text={message.text} />
           ))}
       </MessageList>
+      <ul></ul>
       <ChatForm onSubmit={chatSubmit}>
         <ChatInput
           placeholder="무엇이든 말해도 괜찮아요"
@@ -98,6 +107,7 @@ const MessageList = styled.ul`
   overflow: hidden;
   margin: 0;
   padding: 1rem 1rem;
+  overflow: auto;
 `;
 
 const ChatForm = styled.form`
